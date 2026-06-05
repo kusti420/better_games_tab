@@ -1,0 +1,2 @@
+-- Stub backend. Required so Millennium injects webkit.js on community pages.
+-- Plugins with useBackend=false are skipped there after the Millennium update.
