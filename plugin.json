@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/main/src/sys/plugin-schema.json",
-  "name": "profile-bg-cache",
-  "common_name": "Profile Background Cache",
+  "name": "better_games_tab",
+  "common_name": "Better Games Tab",
   "description": "Caches your Steam profile background and applies it to the games tab.",
   "version": "1.0.0",
   "backendType": "lua"
