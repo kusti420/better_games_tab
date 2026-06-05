@@ -14,3 +14,6 @@ A [Millennium](https://steambrew.app) plugin that caches your Steam profile back
 ## Installation
 
 Install via the Millennium plugin browser, or drop the folder into your Millennium plugins directory.
+
+
+<img width="2532" height="1387" alt="image" src="https://github.com/user-attachments/assets/de5b3a61-4db3-498a-b14b-898dc88604a8" />
