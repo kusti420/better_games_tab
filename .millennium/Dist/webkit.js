@@ -9,7 +9,6 @@ let PluginEntryPointMain = function() {
         "use strict";
 
         function saveBackground() {
-            // body also has has_profile_background but no inline style — target the div
             const el = document.querySelector("div.has_profile_background[style*='background-image']");
             if (!el) return false;
             const bg = el.style.backgroundImage;
@@ -20,27 +19,42 @@ let PluginEntryPointMain = function() {
             return false;
         }
 
+        function getOrCreateStyle() {
+            let el = document.getElementById("bg-cache-style");
+            if (!el) {
+                el = document.createElement("style");
+                el.id = "bg-cache-style";
+                document.head.appendChild(el);
+            }
+            return el;
+        }
+
         function applyBackground() {
             const bg = localStorage.getItem(STORAGE_KEY);
-            if (!bg) return;
-            // Apply to body so image layers on top of body's existing background-color
-            document.body.style.setProperty("background-image", bg, "important");
-            document.body.style.setProperty("background-size", "cover", "important");
-            document.body.style.setProperty("background-position", "center top", "important");
-            document.body.style.setProperty("background-attachment", "fixed", "important");
+            const style = getOrCreateStyle();
+            if (bg) {
+                style.textContent = `
+                    html {
+                        background-image: ${bg} !important;
+                        background-size: cover !important;
+                        background-position: center top !important;
+                        background-attachment: fixed !important;
+                        background-color: #1b2838 !important;
+                    }
+                    body, body > div, .Panel { background-color: transparent !important; }
+                `;
+            } else {
+                style.textContent = "";
+            }
         }
 
         exports.default = async function() {
             applyBackground();
 
-            // Reapply whenever React mutates body's style (e.g. overrides background-image)
             new MutationObserver(() => {
-                if (localStorage.getItem(STORAGE_KEY) && document.body.style.backgroundImage !== localStorage.getItem(STORAGE_KEY)) {
-                    applyBackground();
-                }
-            }).observe(document.body, { attributes: true, attributeFilter: ["style"] });
+                if (!document.getElementById("bg-cache-style")) applyBackground();
+            }).observe(document.head, { childList: true });
 
-            // Poll for .has_profile_background — React may render it after script runs
             let attempts = 0;
             const poll = setInterval(() => {
                 if (saveBackground() || ++attempts >= 20) {
@@ -55,13 +69,13 @@ let PluginEntryPointMain = function() {
     }({}, window.MILLENNIUM_API);
 };
 
-function ExecutePluginModule() {
+async function ExecutePluginModule() {
     let t = PluginEntryPointMain();
     Object.assign(window.PLUGIN_LIST[pluginName], {
         ...t,
         __millennium_internal_plugin_name_do_not_use_or_change__: pluginName
     });
-    t.default();
+    await t.default();
 }
 
 ExecutePluginModule();
